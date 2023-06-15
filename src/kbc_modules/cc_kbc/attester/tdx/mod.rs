@@ -29,13 +29,12 @@ pub struct TdxAttester {}
 
 impl Attester for TdxAttester {
     fn get_evidence(&self, report_data: String) -> Result<String> {
-        let mut report_data_bin = base64::decode(report_data)?;
-        if report_data_bin.len() != 48 {
+        let report_data_bin = base64::decode(report_data)?;
+        if report_data_bin.len() != 64 {
             return Err(anyhow!(
-                "TDX Attester: Report data should be SHA384 base64 String"
+                "TDX Attester: Report data should be SHA512 base64 String"
             ));
         }
-        report_data_bin.extend([0; 16]);
 
         let tdx_report_data = tdx_attest_rs::tdx_report_data_t {
             d: report_data_bin.as_slice().try_into()?,

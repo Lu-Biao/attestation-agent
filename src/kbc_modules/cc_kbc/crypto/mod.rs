@@ -9,7 +9,7 @@ use anyhow::*;
 use kbs_types::TeePubKey;
 use rsa::{PaddingScheme, PublicKeyParts, RsaPrivateKey, RsaPublicKey};
 use serde::{Deserialize, Serialize};
-use sha2::{Digest, Sha384};
+use sha2::{Digest, Sha512};
 use zeroize::Zeroizing;
 
 const RSA_ALGORITHM: &str = "RSA1_5";
@@ -98,9 +98,9 @@ pub fn decrypt_response(response: &Response, tee_key: TeeKey) -> Result<Vec<u8>>
     Ok(plaintext)
 }
 
-// Returns a base64 of the sha384 of all chunks.
+// Returns a base64 of the sha512 of all chunks.
 pub fn hash_chunks(chunks: Vec<Vec<u8>>) -> String {
-    let mut hasher = Sha384::new();
+    let mut hasher = Sha512::new();
 
     for chunk in chunks.iter() {
         hasher.update(chunk);
