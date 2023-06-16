@@ -63,6 +63,8 @@ pub trait AttestationAPIs {
         resource_path: &str,
         kbs_uri: &str,
     ) -> Result<Vec<u8>>;
+
+    async fn attestation(&mut self, kbc_name: &str, kbs_uri: &str) -> Result<String>;
 }
 
 /// Attestation agent to provide attestation service.
@@ -148,6 +150,18 @@ impl AttestationAPIs for AttestationAgent {
             .get_mut(kbc_name)
             .ok_or_else(|| anyhow!("The KBC instance does not existing!"))?
             .get_resource(resource_uri)
+            .await
+    }
+
+    async fn attestation(&mut self, kbc_name: &str, kbs_uri: &str) -> Result<String> {
+        if !self.kbc_instance_map.contains_key(kbc_name) {
+            self.instantiate_kbc(kbc_name, kbs_uri)?;
+        }
+
+        self.kbc_instance_map
+            .get_mut(kbc_name)
+            .ok_or_else(|| anyhow!("The KBC instance does not existing!"))?
+            .attestation()
             .await
     }
 }

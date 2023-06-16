@@ -54,6 +54,10 @@ pub trait KbcInterface: Send {
     async fn get_resource(&mut self, _rid: ResourceUri) -> Result<Vec<u8>> {
         bail!("Get Resource API of this KBC is unimplement!")
     }
+
+    async fn attestation(&mut self) -> Result<String> {
+        bail!("Attestation API of this KBC is unimplement!")
+    }
 }
 
 /// A container type for [KbcInterface] trait objects.

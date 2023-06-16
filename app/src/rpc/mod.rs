@@ -4,6 +4,7 @@
 //
 
 pub mod getresource;
+pub mod gettoken;
 pub mod keyprovider;
 
 #[cfg(feature = "ttrpc")]

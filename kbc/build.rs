@@ -9,7 +9,10 @@ fn main() -> std::io::Result<()> {
         println!("cargo:rustc-link-search=native=/usr/local/lib/rats-tls");
         println!("cargo:rustc-link-lib=dylib=rats_tls");
     }
-
+    #[cfg(feature = "cc_kbc")]
+    {
+        tonic_build::compile_protos("src/cc_kbc/attestation.proto")?;
+    }
     #[cfg(feature = "gen-proto")]
     {
         tonic_build::configure()

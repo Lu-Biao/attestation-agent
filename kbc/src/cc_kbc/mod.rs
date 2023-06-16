@@ -15,6 +15,29 @@ use resource_uri::ResourceUri;
 use url::Url;
 use zeroize::Zeroizing;
 
+use self::attestation::{
+    attestation_service_client::AttestationServiceClient, AttestationRequest,
+};
+
+use tonic::transport::Channel;
+
+mod attestation {
+    #![allow(unknown_lints)]
+    #![allow(clippy::derive_partial_eq_without_eq)]
+    tonic::include_proto!("attestation");
+}
+
+pub struct Grpc {
+    pub inner: AttestationServiceClient<Channel>,
+}
+
+impl Grpc {
+    pub async fn new(as_addr: String) -> Result<Self> {
+        let inner = AttestationServiceClient::connect(as_addr).await?;
+        Ok(Self { inner })
+    }
+}
+
 pub struct Kbc {
     kbs_uri: Url,
     token: Option<String>,
@@ -47,6 +70,33 @@ impl KbcInterface for Kbc {
         let data = self.kbs_protocol_wrapper().http_get(resource_url).await?;
 
         Ok(data)
+    }
+
+    async fn attestation(&mut self) -> Result<String> {
+
+        let evidence = self.kbs_protocol_wrapper.generate_evidence()?;
+
+        log::debug!("nonce = {}", self.kbs_protocol_wrapper.nonce);
+
+        let req = tonic::Request::new(AttestationRequest {
+            tee: 3, // FIXME: shoud remove the magic number.
+            nonce: String::from(&self.kbs_protocol_wrapper.nonce),
+            evidence: serde_json::to_string(&evidence).unwrap(),
+        });
+
+        let as_addr = String::from("http://10.0.176.102:60004");
+        let mut grpc = Grpc::new(as_addr).await?;
+
+        let results_string = grpc
+            .inner
+            .attestation_evaluate(req)
+            .await?
+            .into_inner()
+            .attestation_results;
+
+        log::debug!("attestation result = {}", results_string);
+
+        Ok(results_string)
     }
 }
 

@@ -28,9 +28,9 @@ pub trait KbsRequest {
 }
 
 pub struct KbsProtocolWrapper {
+    pub nonce: String,
     tee: String,
     tee_key: Option<TeeKey>,
-    nonce: String,
     attester: Option<Box<dyn Attester + Send + Sync>>,
     http_client: reqwest::Client,
     authenticated: bool,
@@ -44,16 +44,16 @@ impl KbsProtocolWrapper {
         let attester = tee_type.to_attester().ok();
 
         Ok(KbsProtocolWrapper {
+            nonce: String::from("abc123"),
             tee: tee_type.to_string(),
             tee_key: TeeKey::new().ok(),
-            nonce: String::default(),
             attester,
             http_client: build_http_client().unwrap(),
             authenticated: false,
         })
     }
 
-    fn generate_evidence(&self) -> Result<Attestation> {
+    pub fn generate_evidence(&self) -> Result<Attestation> {
         let key = self
             .tee_key
             .as_ref()

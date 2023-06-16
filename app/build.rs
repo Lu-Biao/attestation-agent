@@ -11,6 +11,7 @@ fn main() -> std::io::Result<()> {
     {
         tonic_build::compile_protos("../protos/keyprovider.proto")?;
         tonic_build::compile_protos("../protos/getresource.proto")?;
+        tonic_build::compile_protos("../protos/gettoken.proto")?;
     }
 
     #[cfg(feature = "ttrpc")]

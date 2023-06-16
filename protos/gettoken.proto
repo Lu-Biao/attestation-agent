@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package gettoken;
+
+message GetTokenRequest {
+    string KbcName = 1;
+    string KbsUri = 2;
+}
+
+message GetTokenResponse {
+    string Token = 1;
+}
+
+service GetTokenService {
+    rpc GetToken(GetTokenRequest) returns (GetTokenResponse) {};
+}
