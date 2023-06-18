@@ -70,5 +70,10 @@ pub async fn grpc_main() -> Result<()> {
     let keyprovider_server = rpc::keyprovider::grpc::start_grpc_service(keyprovider_socket);
     let getresource_server = rpc::getresource::grpc::start_grpc_service(getresource_socket);
     let gettoken_server = rpc::gettoken::grpc::start_grpc_service(gettoken_socket);
+
+    let token = rpc::gettoken::grpc::do_get_token("cc_kbc", "http://127.0.0.1:8080").await.unwrap();
+
+    debug!("do_get_token: {}", token);
+
     tokio::join!(keyprovider_server, getresource_server, gettoken_server).0
 }
