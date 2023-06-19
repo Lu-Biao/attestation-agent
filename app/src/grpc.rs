@@ -15,6 +15,12 @@ lazy_static! {
         Arc::new(tokio::sync::Mutex::new(AttestationAgent::new()));
 }
 
+pub async fn do_attestation() -> Result<()> {
+    let token = rpc::gettoken::grpc::do_get_token("cc_kbc", "http://127.0.0.1:8080").await.unwrap();
+    log::info!("Attestation result: {}", token);
+    Ok(())
+}
+
 pub async fn grpc_main() -> Result<()> {
     let app_matches = App::new(rpc::AGENT_NAME)
         .version(env!("CARGO_PKG_VERSION"))
@@ -71,9 +77,7 @@ pub async fn grpc_main() -> Result<()> {
     let getresource_server = rpc::getresource::grpc::start_grpc_service(getresource_socket);
     let gettoken_server = rpc::gettoken::grpc::start_grpc_service(gettoken_socket);
 
-    let token = rpc::gettoken::grpc::do_get_token("cc_kbc", "http://127.0.0.1:8080").await.unwrap();
-
-    debug!("do_get_token: {}", token);
+    do_attestation().await.unwrap();
 
     tokio::join!(keyprovider_server, getresource_server, gettoken_server).0
 }

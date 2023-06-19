@@ -28,7 +28,8 @@ async fn main() {
         if #[cfg(feature = "ttrpc")] {
             ttrpc::ttrpc_main().await.unwrap();
         } else if #[cfg(feature = "grpc")] {
-            grpc::grpc_main().await.unwrap();
+            //grpc::grpc_main().await.unwrap();
+            grpc::do_attestation().await.unwrap();
         } else {
             compile_error!("one feature of `grpc` or `ttrpc` must be enabled.");
         }
